@@ -42,7 +42,9 @@
 // On board LED
 #define BLINK_GPIO 2
 
-#ifdef CONFIG_IDF_TARGET_ESP32S3
+#if defined(CONFIG_IDF_TARGET_ESP32S3)
+#define RESET_PIN GPIO_NUM_43
+#elif defined(CONFIG_IDF_TARGET_ESP32S2)
 #define RESET_PIN GPIO_NUM_43
 #else
 #define RESET_PIN GPIO_NUM_23
