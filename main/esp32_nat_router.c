@@ -42,7 +42,12 @@
 // On board LED
 #define BLINK_GPIO 2
 
-#define RESET_PIN_MASK ((1ULL << GPIO_NUM_23))
+#ifdef CONFIG_IDF_TARGET_ESP32S3
+#define RESET_PIN GPIO_NUM_43
+#else
+#define RESET_PIN GPIO_NUM_23
+#endif
+#define RESET_PIN_MASK ((1ULL << RESET_PIN))
 
 /* FreeRTOS event group to signal when we are connected*/
 static EventGroupHandle_t wifi_event_group;
@@ -583,7 +588,7 @@ bool checkForResetPinAndReset()
     io_conf.pull_up_en = GPIO_PULLUP_ENABLE;
     ESP_ERROR_CHECK(gpio_config(&io_conf));
 
-    int gpioLevel = gpio_get_level(GPIO_NUM_23);
+    int gpioLevel = gpio_get_level(RESET_PIN);
     int counter = 0;
     while (counter < 5 && gpioLevel == 0)
     {
@@ -601,8 +606,8 @@ bool checkForResetPinAndReset()
         }
 
         counter++;
-        ESP_LOGW(TAG, "Reset Pin (GPIO 23) set for %ds", counter);
-        gpioLevel = gpio_get_level(GPIO_NUM_23);
+        ESP_LOGW(TAG, "Reset Pin (GPIO 23/43) set for %ds", counter);
+        gpioLevel = gpio_get_level(RESET_PIN);
     }
     if (counter == 5)
     {
